@@ -83,8 +83,8 @@ const pages = [
         <div class="single-image-frame">
           <img
             class="single-image"
-            src="${images.colors}"
-            alt="page 2 left"
+            src="${images.hero}"
+            alt="page 1 right"
             draggable="false"
           />
         </div>
@@ -99,8 +99,8 @@ const pages = [
         <div class="single-image-frame">
           <img
             class="single-image"
-            src="${images.hero}"
-            alt="page 1 right"
+            src="${images.colors}"
+            alt="page 2 left"
             draggable="false"
           />
         </div>
@@ -140,12 +140,13 @@ function normalizeSpreadIndex(index) {
 
 function handleResize() {
   const rect = book.getBoundingClientRect();
+  const activePageWidth = isSinglePageView() ? rect.width : rect.width / 2;
   state.width = rect.width;
   state.height = rect.height;
-  state.pageWidth = rect.width / 2;
-  state.spineX = state.pageWidth;
-  state.diagonal = Math.sqrt(state.pageWidth ** 2 + state.height ** 2);
-  state.cornerThreshold = Math.max(56, Math.min(140, state.pageWidth * 0.18));
+  state.pageWidth = activePageWidth;
+  state.spineX = activePageWidth;
+  state.diagonal = Math.sqrt(activePageWidth ** 2 + state.height ** 2);
+  state.cornerThreshold = Math.max(56, Math.min(140, activePageWidth * 0.18));
 
   if (!state.isDragging && !state.isAnimating) {
     renderPages();
@@ -209,16 +210,23 @@ function renderPages() {
 
   cancelAnimationFrame(state.animationFrame);
   flap.style.display = "none";
+  flap.style.clipPath = "none";
+  flapContent.style.transform = "none";
+  foldGradient.style.opacity = "0";
   leftFront.style.clipPath = "none";
   rightFront.style.clipPath = "none";
+  rightFront.style.transform = "translateZ(0)";
+  rightFront.style.transformOrigin = "";
+  rightFront.style.boxShadow = "";
 
   leftUnder.innerHTML = "";
   rightUnder.innerHTML = "";
+  rightUnder.style.display = "none";
+  rightUnder.style.opacity = "1";
 
   if (isSinglePageView()) {
     leftFront.innerHTML = "";
     leftUnder.style.display = "none";
-    rightUnder.style.display = "none";
     leftFront.style.display = "none";
     rightFront.style.display = "block";
     rightFront.innerHTML = pages[state.singleIndex] || "";
@@ -262,6 +270,98 @@ function setZoom(nextZoom) {
   state.zoom = Number(clampedZoom.toFixed(2));
   applyZoom();
   syncControls();
+}
+
+function startSinglePageDrag(side, x) {
+  if (!isSinglePageView() || state.isAnimating || state.isDragging) {
+    return;
+  }
+
+  const targetIndex = state.singleIndex + (side === "right" ? 1 : -1);
+
+  if (!pages[targetIndex]) {
+    return;
+  }
+
+  state.activeSide = side;
+  state.activeFrontPage = rightFront;
+  state.isDragging = true;
+
+  rightUnder.style.display = "block";
+  rightUnder.innerHTML = pages[targetIndex];
+  rightFront.style.transformOrigin =
+    side === "right" ? "left center" : "right center";
+
+  syncControls();
+  updateSinglePageFlip(x);
+}
+
+function updateSinglePageFlip(x) {
+  if (!state.activeFrontPage || !isSinglePageView()) {
+    return;
+  }
+
+  const clampedX = Math.max(0, Math.min(state.width, x));
+  const progress =
+    state.activeSide === "right"
+      ? 1 - clampedX / state.width
+      : clampedX / state.width;
+  const boundedProgress = Math.max(0, Math.min(1, progress));
+  const angle = (state.activeSide === "right" ? -1 : 1) * boundedProgress * 179;
+
+  state.activeFrontPage.style.transform = `perspective(2200px) rotateY(${angle}deg)`;
+  state.activeFrontPage.style.boxShadow = `0 18px 36px rgba(45, 16, 24, ${0.14 + boundedProgress * 0.14})`;
+  rightUnder.style.opacity = String(0.58 + boundedProgress * 0.42);
+}
+
+function completeSinglePageTurn(fromX, forceComplete = null) {
+  if (!state.activeSide || !state.activeFrontPage || !isSinglePageView()) {
+    return;
+  }
+
+  const shouldComplete =
+    forceComplete ??
+    ((state.activeSide === "right" && fromX < state.width / 2) ||
+      (state.activeSide === "left" && fromX > state.width / 2));
+
+  state.isDragging = false;
+  state.isAnimating = true;
+  syncControls();
+
+  const activeSide = state.activeSide;
+  const restingX = activeSide === "right" ? state.width : 0;
+  const targetX = shouldComplete
+    ? activeSide === "right"
+      ? 0
+      : state.width
+    : restingX;
+  const startTime = performance.now();
+
+  cancelAnimationFrame(state.animationFrame);
+
+  function animate(now) {
+    const progress = Math.min((now - startTime) / TURN_DURATION_MS, 1);
+    const eased = easeInOutCubic(progress);
+    const currentX = fromX + (targetX - fromX) * eased;
+
+    updateSinglePageFlip(currentX);
+
+    if (progress < 1) {
+      state.animationFrame = requestAnimationFrame(animate);
+      return;
+    }
+
+    if (shouldComplete) {
+      state.singleIndex += activeSide === "right" ? 1 : -1;
+    }
+
+    state.activeSide = null;
+    state.activeFrontPage = null;
+    state.isAnimating = false;
+    renderPages();
+  }
+
+  state.animationFrame = requestAnimationFrame(animate);
 }
 
 function clipPolygon(points, a, b, c, keepInside) {
@@ -513,8 +613,7 @@ function goNext() {
   }
 
   if (isSinglePageView()) {
-    state.singleIndex += 1;
-    renderPages();
+    turnSinglePage("right");
     return;
   }
 
@@ -527,8 +626,7 @@ function goPrevious() {
   }
 
   if (isSinglePageView()) {
-    state.singleIndex -= 1;
-    renderPages();
+    turnSinglePage("left");
     return;
   }
 
@@ -536,7 +634,7 @@ function goPrevious() {
 }
 
 book.addEventListener("pointerdown", (event) => {
-  if (state.isAnimating || state.isDragging || isSinglePageView()) {
+  if (state.isAnimating || state.isDragging) {
     return;
   }
 
@@ -546,6 +644,19 @@ book.addEventListener("pointerdown", (event) => {
   const threshold = state.cornerThreshold;
 
   book.setPointerCapture(event.pointerId);
+
+  if (isSinglePageView()) {
+    if (x > state.width - threshold && canGoNext()) {
+      startSinglePageDrag("right", x);
+      return;
+    }
+
+    if (x < threshold && canGoPrevious()) {
+      startSinglePageDrag("left", x);
+    }
+
+    return;
+  }
 
   if (x > state.width - threshold && y < threshold && canGoNext()) {
     startDrag("right", [state.width, 0], x, y);
@@ -568,20 +679,32 @@ book.addEventListener("pointerdown", (event) => {
 });
 
 book.addEventListener("pointermove", (event) => {
-  if (!state.isDragging || isSinglePageView()) {
+  if (!state.isDragging) {
     return;
   }
 
   const rect = book.getBoundingClientRect();
+
+  if (isSinglePageView()) {
+    updateSinglePageFlip(event.clientX - rect.left);
+    return;
+  }
+
   updateFold(event.clientX - rect.left, event.clientY - rect.top);
 });
 
 function handlePointerRelease(event) {
-  if (!state.isDragging || isSinglePageView()) {
+  if (!state.isDragging) {
     return;
   }
 
   const rect = book.getBoundingClientRect();
+
+  if (isSinglePageView()) {
+    completeSinglePageTurn(event.clientX - rect.left);
+    return;
+  }
+
   completeTurn(event.clientX - rect.left, event.clientY - rect.top);
 }
 
@@ -611,6 +734,24 @@ function turnPage(side) {
 
   startDrag(side, corner, startX, startY);
   completeTurn(startX, startY, true);
+}
+
+function turnSinglePage(side) {
+  if (!isSinglePageView() || state.isAnimating || state.isDragging) {
+    return;
+  }
+
+  if (side === "right" && !canGoNext()) {
+    return;
+  }
+
+  if (side === "left" && !canGoPrevious()) {
+    return;
+  }
+
+  const startX = side === "right" ? state.width - 24 : 24;
+  startSinglePageDrag(side, startX);
+  completeSinglePageTurn(startX, true);
 }
 
 prevButton.addEventListener("click", goPrevious);

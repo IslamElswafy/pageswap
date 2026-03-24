@@ -388,15 +388,27 @@ body.single-page-view .book-container {
 }
 
 body.single-page-view #left-front,
-body.single-page-view #left-under,
-body.single-page-view #right-under {
+body.single-page-view #left-under {
   display: none !important;
 }
 
-body.single-page-view #right-front {
+body.single-page-view #right-front,
+body.single-page-view #right-under {
   left: 0;
   width: 100%;
   border-left: 0;
+}
+
+body.single-page-view #right-front {
+  background-image:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.28), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(122, 44, 53, 0.05), transparent 25%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 16%),
+    linear-gradient(180deg, var(--paper) 0%, var(--paper-shadow) 100%);
+}
+
+body.single-page-view #right-under {
+  display: none;
   background-image:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.28), transparent 34%),
     radial-gradient(circle at bottom right, rgba(122, 44, 53, 0.05), transparent 25%),
