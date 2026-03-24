@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>كتالوج المنتجات | Book Style</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css.css" />
+    <script src="js.js" defer></script>
+  </head>
+  <body>
+    <main class="experience">
+      <section class="book-stage" aria-label="Interactive catalog book">
+        <button
+          class="nav-arrow nav-arrow-prev"
+          id="prevButton"
+          type="button"
+          aria-label="الصفحة السابقة"
+        >
+          <span aria-hidden="true">&#8592;</span>
+        </button>
+
+        <div class="book-frame">
+          <div class="book-container" id="book">
+            <div class="page" id="left-under"></div>
+            <div class="page" id="right-under"></div>
+
+            <div class="page front-page" id="left-front"></div>
+            <div class="page front-page" id="right-front"></div>
+
+            <div class="flap" id="flap">
+              <div class="flap-content" id="flapContent"></div>
+              <div class="fold-gradient" id="foldGradient"></div>
+            </div>
+          </div>
+        </div>
+
+        <button
+          class="nav-arrow nav-arrow-next"
+          id="nextButton"
+          type="button"
+          aria-label="الصفحة التالية"
+        >
+          <span aria-hidden="true">&#8594;</span>
+        </button>
+      </section>
+
+      <div class="viewer-toolbar" aria-label="أدوات العرض">
+        <button
+          class="display-toggle"
+          id="viewToggle"
+          type="button"
+          aria-label="عرض صفحة واحدة"
+          title="عرض صفحة واحدة"
+        >
+          <span class="layout-icon layout-icon-single" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <rect x="6" y="4" width="12" height="16" rx="2"></rect>
+              <line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="9" y1="12" x2="15" y2="12"></line>
+              <line x1="9" y1="16" x2="13" y2="16"></line>
+            </svg>
+          </span>
+          <span class="layout-icon layout-icon-spread" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M4.5 6.5A2.5 2.5 0 0 1 7 4h3.5a3.5 3.5 0 0 1 1.5.34V19.5a3.5 3.5 0 0 0-1.5-.34H7a2.5 2.5 0 0 0-2.5 2.5z"></path>
+              <path d="M19.5 6.5A2.5 2.5 0 0 0 17 4h-3.5a3.5 3.5 0 0 0-1.5.34V19.5a3.5 3.5 0 0 1 1.5-.34H17a2.5 2.5 0 0 1 2.5 2.5z"></path>
+            </svg>
+          </span>
+        </button>
+
+        <div class="spread-status" aria-live="polite">
+          <span class="status-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H12v18H7.5A2.5 2.5 0 0 0 5 23z"></path>
+              <path d="M19 5.5A2.5 2.5 0 0 0 16.5 3H12v18h4.5A2.5 2.5 0 0 1 19 23z"></path>
+            </svg>
+          </span>
+          <span class="spread-status-value" id="spreadStatus"></span>
+        </div>
+
+        <div class="zoom-controls" aria-label="أدوات التكبير">
+          <button
+            class="zoom-button"
+            id="zoomOutButton"
+            type="button"
+            aria-label="تصغير"
+            title="تصغير"
+          >
+            <svg viewBox="0 0 24 24" focusable="false">
+              <circle cx="11" cy="11" r="6.5"></circle>
+              <line x1="8.5" y1="11" x2="13.5" y2="11"></line>
+              <line x1="16" y1="16" x2="20" y2="20"></line>
+            </svg>
+          </button>
+          <span class="zoom-value" id="zoomValue">100%</span>
+          <button
+            class="zoom-button"
+            id="zoomInButton"
+            type="button"
+            aria-label="تكبير"
+            title="تكبير"
+          >
+            <svg viewBox="0 0 24 24" focusable="false">
+              <circle cx="11" cy="11" r="6.5"></circle>
+              <line x1="11" y1="8.5" x2="11" y2="13.5"></line>
+              <line x1="8.5" y1="11" x2="13.5" y2="11"></line>
+              <line x1="16" y1="16" x2="20" y2="20"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
