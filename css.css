@@ -746,3 +746,91 @@ body.single-page-view .flap-content {
     right: 0.25rem;
   }
 }
+
+.rotate-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .rotate-overlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(circle at top, rgba(251, 244, 230, 0.1), transparent 30%),
+      linear-gradient(135deg, #431520 0%, var(--bg-deep) 42%, #a46d5f 100%);
+  }
+
+  .rotate-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2.5rem;
+  }
+
+  .rotate-icon {
+    width: 72px;
+    height: 72px;
+    color: var(--paper);
+    animation: rotatePhone 2.4s ease-in-out infinite;
+  }
+
+  .rotate-text {
+    margin: 0;
+    color: rgba(251, 244, 230, 0.88);
+    font-family: "Noto Naskh Arabic", serif;
+    font-size: 1.1rem;
+    text-align: center;
+    line-height: 1.8;
+    direction: rtl;
+  }
+
+  .rotate-dismiss {
+    border: 1px solid rgba(251, 244, 230, 0.25);
+    border-radius: 999px;
+    padding: 0.6rem 1.6rem;
+    background: rgba(251, 244, 230, 0.1);
+    color: rgba(251, 244, 230, 0.75);
+    font-family: "Noto Naskh Arabic", serif;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background-color 160ms ease;
+  }
+
+  .rotate-dismiss:hover,
+  .rotate-dismiss:active {
+    background: rgba(251, 244, 230, 0.2);
+  }
+
+  .rotate-overlay.dismissed {
+    display: none;
+  }
+
+  @keyframes rotatePhone {
+    0%, 15% {
+      transform: rotate(0deg);
+      opacity: 1;
+    }
+    45%, 55% {
+      transform: rotate(-90deg);
+      opacity: 1;
+    }
+    70% {
+      transform: rotate(-90deg);
+      opacity: 0;
+    }
+    71% {
+      transform: rotate(0deg);
+      opacity: 0;
+    }
+    85%, 100% {
+      transform: rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+}

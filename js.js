@@ -1106,6 +1106,10 @@ zoomInButton.addEventListener("click", () => {
   setZoom(state.zoom + ZOOM_STEP);
 });
 
+document.getElementById("rotateDismiss").addEventListener("click", () => {
+  document.getElementById("rotateOverlay").classList.add("dismissed");
+});
+
 window.addEventListener("keydown", (event) => {
   if (event.key === "ArrowRight") {
     goNext();
