@@ -588,6 +588,11 @@ function renderPages() {
   preloadNearbyPages();
 }
 
+if (window.innerWidth <= 768) {
+  state.viewMode = "single";
+  state.singleIndex = getSingleIndexForSpread(state.leftIndex);
+}
+
 applyZoom();
 renderPages();
 
