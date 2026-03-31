@@ -536,7 +536,7 @@ function setSpreadLayers(startIndex) {
 
 function renderPages() {
   const edgeCoverType = isSinglePageView() ? null : getEdgeCoverType();
-  const isSingleSurface = isSinglePageView();
+  const isSingleSurface = isSinglePageView() || edgeCoverType !== null;
 
   document.body.classList.toggle("single-page-view", isSinglePageView());
   book.classList.toggle("book-container--single-surface", isSingleSurface);

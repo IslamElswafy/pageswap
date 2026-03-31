@@ -423,6 +423,7 @@ body.single-page-view .flap-content {
 }
 
 .book-container--edge-cover {
+  --width: var(--single-width);
   width: var(--single-width);
 }
 
