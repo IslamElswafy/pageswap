@@ -9,8 +9,13 @@
   --accent: #7a2c35;
   --accent-soft: rgba(122, 44, 53, 0.1);
   --line: rgba(93, 41, 44, 0.14);
-  --spread-width: min(1700px, calc(100vw - 2.2rem));
-  --single-width: min(1360px, calc(100vw - 2.2rem));
+  --stage-padding: clamp(0.75rem, 1.5vw, 1.5rem);
+  --arrow-clearance: clamp(48px, 10vw, 140px);
+  --frame-safe-width: calc(
+    100vw - (var(--stage-padding) * 2) - var(--arrow-clearance)
+  );
+  --spread-width: min(1700px, var(--frame-safe-width));
+  --single-width: min(1360px, var(--frame-safe-width));
   --width: var(--spread-width);
   --height: min(900px, calc(100vh - 8rem));
   --page-padding: clamp(1rem, 2vw, 2.25rem);
@@ -25,35 +30,9 @@ body {
   margin: 0;
   min-height: 100vh;
   overflow: hidden;
-  font-family: "Noto Naskh Arabic", serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
   color: var(--paper);
-  background:
-    radial-gradient(circle at top, rgba(251, 244, 230, 0.14), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(210, 176, 141, 0.18), transparent 28%),
-    linear-gradient(135deg, #431520 0%, var(--bg-deep) 42%, #a46d5f 100%);
-}
-
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-}
-
-body::before {
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.045), transparent 25%),
-    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.03), transparent 22%),
-    radial-gradient(circle at 50% 82%, rgba(255, 255, 255, 0.035), transparent 28%);
-  mix-blend-mode: screen;
-}
-
-body::after {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-  background-size: 22px 22px;
-  opacity: 0.16;
+  background: #1a1a1a;
 }
 
 body.single-page-view {
@@ -63,7 +42,7 @@ body.single-page-view {
 .experience {
   width: 100%;
   height: 100vh;
-  padding: clamp(0.75rem, 1.5vw, 1.5rem);
+  padding: var(--stage-padding);
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   gap: clamp(0.75rem, 1.5vw, 1.25rem);
@@ -121,7 +100,8 @@ body.single-page-view {
 
 .layout-icon svg,
 .zoom-button svg,
-.status-icon svg {
+.status-icon svg,
+.nav-arrow svg {
   width: 100%;
   height: 100%;
   display: block;
@@ -218,48 +198,30 @@ body.single-page-view {
 .book-frame {
   width: 100%;
   min-width: 0;
-  max-width: calc(100% - clamp(48px, 10vw, 140px));
+  max-width: calc(100% - var(--arrow-clearance));
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: clamp(0.35rem, 1.1vw, 0.8rem);
-  border-radius: 36px;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 42%),
-    linear-gradient(180deg, rgba(251, 244, 230, 0.08), rgba(251, 244, 230, 0.02));
-  border: 1px solid rgba(251, 244, 230, 0.12);
-  box-shadow: 0 40px 80px rgba(42, 15, 22, 0.22);
 }
 
 .book-container {
   width: var(--width);
   height: var(--height);
   position: relative;
-  border-radius: 28px;
   overflow: hidden;
   isolation: isolate;
   cursor: grab;
   touch-action: none;
-  background:
-    linear-gradient(90deg, rgba(122, 44, 53, 0.28) 0%, rgba(122, 44, 53, 0.48) 5.5%, transparent 13%),
-    linear-gradient(270deg, rgba(122, 44, 53, 0.18) 0%, transparent 10%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 18%),
-    linear-gradient(180deg, #fbf4e6 0%, #efdfc2 100%);
-  box-shadow:
-    0 32px 64px rgba(45, 16, 24, 0.26),
-    inset 0 0 0 1px rgba(122, 44, 53, 0.12);
+  background: transparent;
+}
+
+body.compact-viewport .book-container {
+  touch-action: pan-y;
 }
 
 .book-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(84, 35, 42, 0.42) 0%, transparent 7%, transparent 93%, rgba(84, 35, 42, 0.2) 100%),
-    linear-gradient(90deg, transparent 48.8%, rgba(122, 44, 53, 0.26) 50%, transparent 51.2%);
-  pointer-events: none;
-  z-index: 4;
+  display: none;
 }
 
 .book-container:active {
@@ -281,7 +243,6 @@ body.single-page-view {
   overflow: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
-  will-change: clip-path, transform;
 }
 
 .page::before {
@@ -334,7 +295,6 @@ body.single-page-view {
   display: none;
   backface-visibility: hidden;
   transform: translateZ(0);
-  will-change: clip-path;
 }
 
 .flap-content {
@@ -351,7 +311,6 @@ body.single-page-view {
   overflow: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
-  will-change: transform;
   box-shadow: 0 18px 28px rgba(45, 16, 24, 0.2);
 }
 
@@ -372,6 +331,17 @@ body.single-page-view {
   opacity: 0;
   backface-visibility: hidden;
   transform: translateZ(0);
+}
+
+.book-container.is-turning .page,
+.book-container.is-turning .flap,
+.book-container.is-turning .flap-content,
+.book-container.is-turning .fold-gradient {
+  will-change: transform, clip-path, opacity;
+}
+
+.book-container.is-compact-turning #right-front,
+.book-container.is-compact-turning #right-under {
   will-change: transform, opacity;
 }
 
@@ -421,6 +391,44 @@ body.single-page-view #right-under {
 
 body.single-page-view .flap-content {
   width: 100%;
+}
+
+body.compact-viewport .viewer-toolbar {
+  box-shadow: inset 0 0 0 1px rgba(251, 244, 230, 0.1);
+  backdrop-filter: none;
+}
+
+body.compact-viewport .page,
+body.compact-viewport .flap-content,
+body.compact-viewport .transition-page,
+body.compact-viewport #right-front,
+body.compact-viewport #right-under {
+  background-image: linear-gradient(180deg, #fbf4e6 0%, #f1e4cd 100%);
+}
+
+body.compact-viewport .page::before {
+  opacity: 0.28;
+  background:
+    linear-gradient(transparent 97%, rgba(93, 41, 44, 0.03) 100%);
+  background-size: 100% 24px;
+}
+
+body.compact-viewport .single-image-frame {
+  padding: 0.5rem;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 1px rgba(122, 44, 53, 0.07);
+}
+
+body.compact-viewport .single-image {
+  border-radius: 16px;
+}
+
+body.compact-viewport .fold-gradient {
+  display: none;
+}
+
+body.compact-viewport .page-number {
+  letter-spacing: 0.08rem;
 }
 
 .book-container--edge-cover {
@@ -564,30 +572,50 @@ body.single-page-view .flap-content {
   position: relative;
   z-index: 1;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   direction: rtl;
   color: var(--ink);
 }
 
 .sheet-zoom {
+  flex: 1 1 auto;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
   transform: scale(var(--content-scale));
   transform-origin: center center;
 }
 
 .image-sheet {
+  width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  justify-self: stretch;
 }
 
 .single-image-frame {
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 0;
   min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline: auto;
   padding: clamp(0.35rem, 0.9vw, 0.65rem);
   border-radius: 28px;
   overflow: hidden;
@@ -599,9 +627,15 @@ body.single-page-view .flap-content {
 
 .single-image {
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
   display: block;
   object-fit: contain;
+  object-position: center center;
+  margin-inline: auto;
   border-radius: 22px;
   background: #f7efe0;
   pointer-events: none;
@@ -621,6 +655,7 @@ body.single-page-view .flap-content {
   color: rgba(93, 41, 44, 0.42);
   font-size: 0.88rem;
   letter-spacing: 0.18rem;
+  direction: rtl;
 }
 
 #left-front .page-number,
@@ -655,10 +690,13 @@ body.single-page-view .flap-content {
   background: #fff;
   color: var(--ink);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  font: inherit;
-  font-size: clamp(1.15rem, 2vw, 1.7rem);
   cursor: pointer;
   transition: transform 160ms ease, opacity 160ms ease, background-color 160ms ease;
+}
+
+.nav-arrow svg {
+  width: clamp(1.2rem, 2vw, 1.45rem);
+  height: clamp(1.2rem, 2vw, 1.45rem);
 }
 
 .nav-arrow-prev {
@@ -679,11 +717,73 @@ body.single-page-view .flap-content {
   cursor: not-allowed;
 }
 
+.whatsapp-float {
+  position: fixed;
+  top: clamp(0.8rem, 2vw, 1.4rem);
+  right: clamp(0.8rem, 2vw, 1.4rem);
+  z-index: 24;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.15rem;
+  height: 3.15rem;
+  padding: 0;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 18px 30px rgba(10, 74, 34, 0.28);
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.whatsapp-float:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 34px rgba(10, 74, 34, 0.32);
+  background: #1fba59;
+}
+
+.whatsapp-float__icon {
+  width: 1.55rem;
+  height: 1.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.whatsapp-float__icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: currentColor;
+}
+
 @media (max-width: 900px) {
   :root {
+    --arrow-clearance: 0px;
     --spread-width: calc(100vw - 1.3rem);
     --single-width: calc(100vw - 1.3rem);
     --height: min(80vh, 780px);
+  }
+
+  body {
+    --width: var(--single-width);
+  }
+
+  #left-front,
+  #left-under {
+    display: none !important;
+  }
+
+  #right-front,
+  #right-under {
+    left: 0;
+    width: 100%;
+    border-left: 0;
+  }
+
+  .flap-content {
+    width: 100%;
   }
 
   .page-number {
@@ -747,6 +847,13 @@ body.single-page-view .flap-content {
   .nav-arrow-next {
     right: 0.25rem;
   }
+
+  .whatsapp-float {
+    top: 0.7rem;
+    right: 0.7rem;
+    width: 3rem;
+    height: 3rem;
+  }
 }
 
 .rotate-overlay {
@@ -784,7 +891,7 @@ body.single-page-view .flap-content {
   .rotate-text {
     margin: 0;
     color: rgba(251, 244, 230, 0.88);
-    font-family: "Noto Naskh Arabic", serif;
+    font-family: inherit;
     font-size: 1.1rem;
     text-align: center;
     line-height: 1.8;
@@ -797,7 +904,7 @@ body.single-page-view .flap-content {
     padding: 0.6rem 1.6rem;
     background: rgba(251, 244, 230, 0.1);
     color: rgba(251, 244, 230, 0.75);
-    font-family: "Noto Naskh Arabic", serif;
+    font-family: inherit;
     font-size: 0.92rem;
     cursor: pointer;
     transition: background-color 160ms ease;
